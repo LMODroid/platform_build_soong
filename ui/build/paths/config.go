@@ -93,6 +93,7 @@ var Configuration = map[string]PathConfig{
 	"jar":     Allowed,
 	"java":    Allowed,
 	"javap":   Allowed,
+	"locale":  Allowed,
 	"lsof":    Allowed,
 	"m4":      Allowed,
 	"nproc":   Allowed,
