@@ -1,4 +1,5 @@
 // Copyright 2021 Google Inc. All rights reserved.
+// Copyright 2022 Project Kaleidoscope. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -486,6 +487,8 @@ type Module struct {
 	maxSdkVersion android.SdkSpec
 
 	sourceExtensions []string
+
+	appendSrcJars android.Paths
 }
 
 func (j *Module) CheckStableSdkVersion(ctx android.BaseModuleContext) error {
@@ -1035,6 +1038,10 @@ func (j *Module) compile(ctx android.ModuleContext, aaptSrcJar android.Path) {
 		srcJars = append(srcJars, aaptSrcJar)
 	}
 	srcFiles = srcFiles.FilterOutByExt(".srcjar")
+
+	if j.appendSrcJars != nil {
+		srcJars = append(srcJars, j.appendSrcJars...)
+	}
 
 	if j.properties.Jarjar_rules != nil {
 		j.expandJarjarRules = android.PathForModuleSrc(ctx, *j.properties.Jarjar_rules)
