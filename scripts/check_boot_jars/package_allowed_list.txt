@@ -269,6 +269,9 @@ org\.chromium\.arc\..*
 com\.google\.wear
 com\.google\.wear\..*
 
+# Lineage adds
+vendor\.lineage.*
+
 # NV adds
 com\.nvidia
 com\.nvidia\..*
