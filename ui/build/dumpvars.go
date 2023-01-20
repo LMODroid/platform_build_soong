@@ -185,8 +185,12 @@ func Banner(config Config, make_vars map[string]string) string {
 
 	fmt.Fprintln(b, "============================================")
 	for _, name := range BannerVars {
-		if make_vars[name] != "" {
-			fmt.Fprintf(b, "%s=%s\n", name, make_vars[name])
+		if make_vars[name] != "" && make_vars["SOONG_BANNER_IGNORE_" + name] != "true" {
+			if make_vars["SOONG_BANNER_FAKE_NAME_" + name] != "" {
+				fmt.Fprintf(b, "%s=%s\n", make_vars["SOONG_BANNER_FAKE_NAME_" + name], make_vars[name])
+			} else {
+				fmt.Fprintf(b, "%s=%s\n", name, make_vars[name])
+			}
 		}
 	}
 	if config.skipKatiControlledByFlags {
@@ -296,6 +300,10 @@ func runMakeProductConfig(ctx Context, config Config) {
 		"BUILD_BROKEN_USES_BUILD_STATIC_LIBRARY",
 		"RELEASE_BUILD_EXECUTION_METRICS",
 	}, exportEnvVars...), BannerVars...)
+	for _, name := range BannerVars {
+	    allVars = append(allVars, "SOONG_BANNER_IGNORE_" + name)
+	    allVars = append(allVars, "SOONG_BANNER_FAKE_NAME_" + name)
+	}
 
 	makeVars, err := dumpMakeVars(ctx, config, config.Arguments(), allVars, true, "")
 	if err != nil {
