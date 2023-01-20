@@ -336,7 +336,12 @@ func dumpVar(ctx build.Context, config build.Config, args []string) {
 
 	varName := flags.Arg(0)
 	if varName == "report_config" {
-		varData, err := build.DumpMakeVars(ctx, config, nil, build.BannerVars)
+		allVars := append([]string{}, build.BannerVars...)
+		for _, name := range build.BannerVars {
+		    allVars = append(allVars, "SOONG_BANNER_IGNORE_" + name)
+		    allVars = append(allVars, "SOONG_BANNER_FAKE_NAME_" + name)
+		}
+		varData, err := build.DumpMakeVars(ctx, config, nil, allVars)
 		if err != nil {
 			ctx.Fatal(err)
 		}
@@ -405,6 +410,10 @@ func dumpVars(ctx build.Context, config build.Config, args []string) {
 	if i := indexList("report_config", allVars); i != -1 {
 		allVars = append(allVars[:i], allVars[i+1:]...)
 		allVars = append(allVars, build.BannerVars...)
+		for _, name := range build.BannerVars {
+		    allVars = append(allVars, "SOONG_BANNER_IGNORE_" + name)
+		    allVars = append(allVars, "SOONG_BANNER_FAKE_NAME_" + name)
+		}
 	}
 
 	if len(allVars) == 0 {
