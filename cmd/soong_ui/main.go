@@ -354,6 +354,10 @@ func dumpVars(ctx build.Context, config build.Config, args []string, _ string) {
 	if i := indexList("report_config", allVars); i != -1 {
 		allVars = append(allVars[:i], allVars[i+1:]...)
 		allVars = append(allVars, build.BannerVars...)
+		for _, name := range build.BannerVars {
+		    allVars = append(allVars, "SOONG_BANNER_IGNORE_" + name)
+		    allVars = append(allVars, "SOONG_BANNER_FAKE_NAME_" + name)
+		}
 	}
 
 	if len(allVars) == 0 {

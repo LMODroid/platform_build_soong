@@ -180,8 +180,12 @@ func Banner(make_vars map[string]string) string {
 
 	fmt.Fprintln(b, "============================================")
 	for _, name := range BannerVars {
-		if make_vars[name] != "" {
-			fmt.Fprintf(b, "%s=%s\n", name, make_vars[name])
+		if make_vars[name] != "" && make_vars["SOONG_BANNER_IGNORE_" + name] != "true" {
+			if make_vars["SOONG_BANNER_FAKE_NAME_" + name] != "" {
+				fmt.Fprintf(b, "%s=%s\n", make_vars["SOONG_BANNER_FAKE_NAME_" + name], make_vars[name])
+			} else {
+				fmt.Fprintf(b, "%s=%s\n", name, make_vars[name])
+			}
 		}
 	}
 	fmt.Fprint(b, "============================================")
