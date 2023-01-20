@@ -275,6 +275,10 @@ func runMakeProductConfig(ctx Context, config Config) {
 		"BUILD_BROKEN_USES_BUILD_STATIC_JAVA_LIBRARY",
 		"BUILD_BROKEN_USES_BUILD_STATIC_LIBRARY",
 	}, exportEnvVars...), BannerVars...)
+	for _, name := range BannerVars {
+	    allVars = append(allVars, "SOONG_BANNER_IGNORE_" + name)
+	    allVars = append(allVars, "SOONG_BANNER_FAKE_NAME_" + name)
+	}
 
 	makeVars, err := dumpMakeVars(ctx, config, config.Arguments(), allVars, true, "")
 	if err != nil {
