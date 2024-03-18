@@ -136,7 +136,12 @@ func init() {
 		if override := ctx.Config().Getenv("OVERRIDE_JLINK_VERSION_NUMBER"); override != "" {
 			return override
 		}
-		return "17"
+		switch ctx.Config().Getenv("EXPERIMENTAL_USE_OPENJDK21_TOOLCHAIN") {
+		case "true":
+			return "21"
+		default:
+			return "17"
+		}
 	})
 
 	pctx.SourcePathVariable("JavaToolchain", "${JavaHome}/bin")
@@ -150,6 +155,8 @@ func init() {
 	pctx.SourcePathVariable("JrtFsJar", "${JavaHome}/lib/jrt-fs.jar")
 	pctx.SourcePathVariable("JavaKytheExtractorJar", "prebuilts/build-tools/common/framework/javac_extractor.jar")
 	pctx.SourcePathVariable("Ziptime", "prebuilts/build-tools/${hostPrebuiltTag}/bin/ziptime")
+
+	pctx.SourcePathVariable("ResourceProcessorBusyBox", "prebuilts/bazel/common/android_tools/android_tools/all_android_tools_deploy.jar")
 
 	pctx.HostBinToolVariable("GenKotlinBuildFileCmd", "gen-kotlin-build-file")
 
@@ -220,10 +227,6 @@ func init() {
 	pctx.HostJavaToolVariable("DataBinderJar", "data-binder.jar")
 	pctx.SourcePathVariable("DataBindingDepClassInfoPath", DataBindingDepClassInfoPath)
 	pctx.SourcePathVariable("DataBindingDepArtifactsPath", DataBindingDepArtifactsPath)
-}
-
-func BazelJavaToolchainVars(config android.Config) string {
-	return android.BazelToolchainVars(config, exportedVars)
 }
 
 func hostBinToolVariableWithSdkToolsPrebuilt(name, tool string) {
