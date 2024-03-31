@@ -216,6 +216,10 @@ vendor\.google_clockwork\.displayoffload3\..*
 # Lineage adds
 vendor\.lineage.*
 
+# NT adds
+com\.nothing
+com\.nothing\..*
+
 # OPLUS adds
 com\.oplus\..*
 
