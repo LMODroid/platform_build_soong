@@ -269,6 +269,10 @@ com\.google\.wear\..*
 # Lineage adds
 vendor\.lineage.*
 
+# NT adds
+com\.nothing
+com\.nothing\..*
+
 # NV adds
 com\.nvidia
 com\.nvidia\..*
