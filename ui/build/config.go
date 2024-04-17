@@ -294,7 +294,9 @@ func defaultBazelProdMode(cfg *configImpl) bool {
 	if runtime.GOOS == "darwin" {
 		return false
 	}
-	return true
+	// TODO(b/255364055): Flip this to true to enable bazel-mode by default
+	// for all users that don't opt out with BUILD_BROKEN_DISABLE_BAZEL.
+	return false
 }
 
 func UploadOnlyConfig(ctx Context, _ ...string) Config {
