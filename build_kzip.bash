@@ -70,10 +70,11 @@ for dir in "${go_modules[@]}"; do
 done
 set +e
 
-declare -r kzip_count=$(find "$out" -name '*.kzip' | wc -l)
+declare -r all_kzips="$(find "$out" -name '*.kzip')"
+declare -r kzip_count=$(echo "$all_kzips" | wc -l)
 (($kzip_count>100000)) || { >&2 printf "ERROR: Too few kzip files were generated: %d\n" $kzip_count; exit 1; }
 
 # Pack
 declare -r allkzip="$KZIP_NAME.kzip"
-"$out/host/linux-x86/bin/merge_zips" "$DIST_DIR/$allkzip" @<(find "$out" -name '*.kzip')
+"$out/host/linux-x86/bin/merge_zips" "$DIST_DIR/$allkzip" @<(echo "$all_kzips")
 
