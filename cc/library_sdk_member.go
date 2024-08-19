@@ -536,7 +536,7 @@ func (p *nativeLibInfoProperties) PopulateFromVariant(ctx android.SdkMemberConte
 	p.ExportedFlags = exportedInfo.Flags
 	if ccModule.linker != nil {
 		specifiedDeps := specifiedDeps{}
-		specifiedDeps = ccModule.linker.linkerSpecifiedDeps(specifiedDeps)
+		specifiedDeps = ccModule.linker.linkerSpecifiedDeps(ctx, ccModule, specifiedDeps)
 
 		if lib := ccModule.library; lib != nil {
 			if !lib.hasStubsVariants() {

@@ -613,7 +613,7 @@ type linker interface {
 	coverageOutputFilePath() android.OptionalPath
 
 	// Get the deps that have been explicitly specified in the properties.
-	linkerSpecifiedDeps(specifiedDeps specifiedDeps) specifiedDeps
+	linkerSpecifiedDeps(ctx android.ConfigAndErrorContext, module *Module, specifiedDeps specifiedDeps) specifiedDeps
 
 	moduleInfoJSON(ctx ModuleContext, moduleInfoJSON *android.ModuleInfoJSON)
 }

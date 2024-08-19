@@ -1981,6 +1981,14 @@ func (m *memberContext) IsTargetBuildBeforeTiramisu() bool {
 	return m.builder.targetBuildRelease.EarlierThan(buildReleaseT)
 }
 
+func (m *memberContext) Config() android.Config {
+	return m.sdkMemberContext.Config()
+}
+
+func (m *memberContext) OtherModulePropertyErrorf(module android.Module, property string, fmt string, args ...interface{}) {
+	m.sdkMemberContext.OtherModulePropertyErrorf(module, property, fmt, args)
+}
+
 var _ android.SdkMemberContext = (*memberContext)(nil)
 
 func (s *sdk) createMemberSnapshot(ctx *memberContext, member *sdkMember, bpModule *bpModule) {

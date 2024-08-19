@@ -188,11 +188,27 @@ func parseTemplate(templateContents string) *template.Template {
 			return m.compiler.baseCompilerProps()
 		},
 		"getCflagsProperty": func(ctx android.ModuleContext, m *Module) []string {
-			cflags := m.compiler.baseCompilerProps().Cflags
-			return cflags.GetOrDefault(ctx, nil)
+			prop := m.compiler.baseCompilerProps().Cflags
+			return prop.GetOrDefault(ctx, nil)
 		},
 		"getLinkerProperties": func(m *Module) BaseLinkerProperties {
 			return m.linker.baseLinkerProps()
+		},
+		"getWholeStaticLibsProperty": func(ctx android.ModuleContext, m *Module) []string {
+			prop := m.linker.baseLinkerProps().Whole_static_libs
+			return prop.GetOrDefault(ctx, nil)
+		},
+		"getStaticLibsProperty": func(ctx android.ModuleContext, m *Module) []string {
+			prop := m.linker.baseLinkerProps().Static_libs
+			return prop.GetOrDefault(ctx, nil)
+		},
+		"getSharedLibsProperty": func(ctx android.ModuleContext, m *Module) []string {
+			prop := m.linker.baseLinkerProps().Shared_libs
+			return prop.GetOrDefault(ctx, nil)
+		},
+		"getHeaderLibsProperty": func(ctx android.ModuleContext, m *Module) []string {
+			prop := m.linker.baseLinkerProps().Header_libs
+			return prop.GetOrDefault(ctx, nil)
 		},
 		"getExtraLibs":   getExtraLibs,
 		"getIncludeDirs": getIncludeDirs,

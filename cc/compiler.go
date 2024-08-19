@@ -811,13 +811,13 @@ type RustBindgenClangProperties struct {
 	Static_rlibs []string `android:"arch_variant,variant_prepend"`
 
 	// list of static libraries that provide headers for this binding.
-	Static_libs []string `android:"arch_variant,variant_prepend"`
+	Static_libs proptools.Configurable[[]string] `android:"arch_variant,variant_prepend"`
 
 	// list of shared libraries that provide headers for this binding.
-	Shared_libs []string `android:"arch_variant"`
+	Shared_libs proptools.Configurable[[]string] `android:"arch_variant"`
 
 	// List of libraries which export include paths required for this module
-	Header_libs []string `android:"arch_variant,variant_prepend"`
+	Header_libs proptools.Configurable[[]string] `android:"arch_variant,variant_prepend"`
 
 	// list of clang flags required to correctly interpret the headers.
 	Cflags proptools.Configurable[[]string] `android:"arch_variant"`

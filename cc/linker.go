@@ -37,19 +37,19 @@ type BaseLinkerProperties struct {
 	// in their entirety.  For static library modules, all of the .o files from the intermediate
 	// directory of the dependency will be linked into this modules .a file.  For a shared library,
 	// the dependency's .a file will be linked into this module using -Wl,--whole-archive.
-	Whole_static_libs []string `android:"arch_variant,variant_prepend"`
+	Whole_static_libs proptools.Configurable[[]string] `android:"arch_variant,variant_prepend"`
 
 	// list of Rust libs that should be statically linked into this module.
 	Static_rlibs []string `android:"arch_variant"`
 
 	// list of modules that should be statically linked into this module.
-	Static_libs []string `android:"arch_variant,variant_prepend"`
+	Static_libs proptools.Configurable[[]string] `android:"arch_variant,variant_prepend"`
 
 	// list of modules that should be dynamically linked into this module.
-	Shared_libs []string `android:"arch_variant"`
+	Shared_libs proptools.Configurable[[]string] `android:"arch_variant"`
 
 	// list of modules that should only provide headers for this module.
-	Header_libs []string `android:"arch_variant,variant_prepend"`
+	Header_libs proptools.Configurable[[]string] `android:"arch_variant,variant_prepend"`
 
 	// list of module-specific flags that will be used for all link steps
 	Ldflags []string `android:"arch_variant"`
@@ -319,11 +319,11 @@ func (linker *baseLinker) baseLinkerProps() BaseLinkerProperties {
 }
 
 func (linker *baseLinker) linkerDeps(ctx DepsContext, deps Deps) Deps {
-	deps.WholeStaticLibs = append(deps.WholeStaticLibs, linker.Properties.Whole_static_libs...)
-	deps.HeaderLibs = append(deps.HeaderLibs, linker.Properties.Header_libs...)
-	deps.StaticLibs = append(deps.StaticLibs, linker.Properties.Static_libs...)
+	deps.WholeStaticLibs = append(deps.WholeStaticLibs, linker.Properties.Whole_static_libs.GetOrDefault(ctx, nil)...)
+	deps.HeaderLibs = append(deps.HeaderLibs, linker.Properties.Header_libs.GetOrDefault(ctx, nil)...)
+	deps.StaticLibs = append(deps.StaticLibs, linker.Properties.Static_libs.GetOrDefault(ctx, nil)...)
 	deps.Rlibs = append(deps.Rlibs, linker.Properties.Static_rlibs...)
-	deps.SharedLibs = append(deps.SharedLibs, linker.Properties.Shared_libs...)
+	deps.SharedLibs = append(deps.SharedLibs, linker.Properties.Shared_libs.GetOrDefault(ctx, nil)...)
 	deps.RuntimeLibs = append(deps.RuntimeLibs, linker.Properties.Runtime_libs...)
 
 	deps.ReexportHeaderLibHeaders = append(deps.ReexportHeaderLibHeaders, linker.Properties.Export_header_lib_headers...)
@@ -674,8 +674,9 @@ func (linker *baseLinker) link(ctx ModuleContext,
 	panic(fmt.Errorf("baseLinker doesn't know how to link"))
 }
 
-func (linker *baseLinker) linkerSpecifiedDeps(specifiedDeps specifiedDeps) specifiedDeps {
-	specifiedDeps.sharedLibs = append(specifiedDeps.sharedLibs, linker.Properties.Shared_libs...)
+func (linker *baseLinker) linkerSpecifiedDeps(ctx android.ConfigAndErrorContext, module *Module, specifiedDeps specifiedDeps) specifiedDeps {
+	eval := module.ConfigurableEvaluator(ctx)
+	specifiedDeps.sharedLibs = append(specifiedDeps.sharedLibs, linker.Properties.Shared_libs.GetOrDefault(eval, nil)...)
 
 	// Must distinguish nil and [] in system_shared_libs - ensure that [] in
 	// either input list doesn't come out as nil.
