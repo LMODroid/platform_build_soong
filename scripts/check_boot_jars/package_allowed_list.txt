@@ -216,6 +216,9 @@ vendor\.google_clockwork\.displayoffload3\..*
 # Lineage adds
 vendor\.lineage.*
 
+# OPLUS adds
+com\.oplus\..*
+
 # QC adds
 com.qualcomm.qti
 com.quicinc.tcmiface
