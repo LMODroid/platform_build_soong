@@ -278,3 +278,6 @@ vendor\.mediatek\.hardware\.nvram\.V1_0
 ###################################################
 # IFAA Manager used for Alipay and/or WeChat payment
 org\.ifaa\.android\.manager.*
+
+# LMODroid adds
+com\.libremobileos.*
