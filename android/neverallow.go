@@ -286,7 +286,7 @@ func neverallowMutator(ctx BottomUpMutatorContext) {
 			continue
 		}
 
-		if !n.appliesToProperties(properties) {
+		if !n.appliesToProperties(ctx, properties) {
 			continue
 		}
 
@@ -603,9 +603,9 @@ func (r *rule) appliesToModuleType(moduleType string) bool {
 	return (len(r.moduleTypes) == 0 || InList(moduleType, r.moduleTypes)) && !InList(moduleType, r.unlessModuleTypes)
 }
 
-func (r *rule) appliesToProperties(properties []interface{}) bool {
-	includeProps := hasAllProperties(properties, r.props)
-	excludeProps := hasAnyProperty(properties, r.unlessProps)
+func (r *rule) appliesToProperties(ctx BottomUpMutatorContext, properties []interface{}) bool {
+	includeProps := hasAllProperties(ctx, properties, r.props)
+	excludeProps := hasAnyProperty(ctx, properties, r.unlessProps)
 	return includeProps && !excludeProps
 }
 
@@ -643,25 +643,25 @@ func fieldNamesForProperties(propertyNames string) []string {
 	return names
 }
 
-func hasAnyProperty(properties []interface{}, props []ruleProperty) bool {
+func hasAnyProperty(ctx BottomUpMutatorContext, properties []interface{}, props []ruleProperty) bool {
 	for _, v := range props {
-		if hasProperty(properties, v) {
+		if hasProperty(ctx, properties, v) {
 			return true
 		}
 	}
 	return false
 }
 
-func hasAllProperties(properties []interface{}, props []ruleProperty) bool {
+func hasAllProperties(ctx BottomUpMutatorContext, properties []interface{}, props []ruleProperty) bool {
 	for _, v := range props {
-		if !hasProperty(properties, v) {
+		if !hasProperty(ctx, properties, v) {
 			return false
 		}
 	}
 	return true
 }
 
-func hasProperty(properties []interface{}, prop ruleProperty) bool {
+func hasProperty(ctx BottomUpMutatorContext, properties []interface{}, prop ruleProperty) bool {
 	for _, propertyStruct := range properties {
 		propertiesValue := reflect.ValueOf(propertyStruct).Elem()
 		for _, v := range prop.fields {
@@ -678,14 +678,14 @@ func hasProperty(properties []interface{}, prop ruleProperty) bool {
 			return prop.matcher.Test(value)
 		}
 
-		if matchValue(propertiesValue, check) {
+		if matchValue(ctx, propertiesValue, check) {
 			return true
 		}
 	}
 	return false
 }
 
-func matchValue(value reflect.Value, check func(string) bool) bool {
+func matchValue(ctx BottomUpMutatorContext, value reflect.Value, check func(string) bool) bool {
 	if !value.IsValid() {
 		return false
 	}
@@ -697,19 +697,26 @@ func matchValue(value reflect.Value, check func(string) bool) bool {
 		value = value.Elem()
 	}
 
-	switch value.Kind() {
-	case reflect.String:
-		return check(value.String())
-	case reflect.Bool:
-		return check(strconv.FormatBool(value.Bool()))
-	case reflect.Int:
-		return check(strconv.FormatInt(value.Int(), 10))
-	case reflect.Slice:
-		slice, ok := value.Interface().([]string)
-		if !ok {
-			panic("Can only handle slice of string")
+	switch v := value.Interface().(type) {
+	case string:
+		return check(v)
+	case bool:
+		return check(strconv.FormatBool(v))
+	case int:
+		return check(strconv.FormatInt((int64)(v), 10))
+	case []string:
+		for _, v := range v {
+			if check(v) {
+				return true
+			}
 		}
-		for _, v := range slice {
+		return false
+	case proptools.Configurable[string]:
+		return check(v.GetOrDefault(ctx, ""))
+	case proptools.Configurable[bool]:
+		return check(strconv.FormatBool(v.GetOrDefault(ctx, false)))
+	case proptools.Configurable[[]string]:
+		for _, v := range v.GetOrDefault(ctx, nil) {
 			if check(v) {
 				return true
 			}
