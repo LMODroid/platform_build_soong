@@ -220,14 +220,28 @@ func (d *dexer) dexCommonFlags(ctx android.ModuleContext,
 		deps = append(deps, f)
 	}
 
+	var requestReleaseMode bool
+	requestReleaseMode, flags = android.RemoveFromList("--release", flags)
+
 	if ctx.Config().Getenv("NO_OPTIMIZE_DX") != "" {
 		flags = append(flags, "--debug")
+		requestReleaseMode = false
 	}
 
 	if ctx.Config().Getenv("GENERATE_DEX_DEBUG") != "" {
 		flags = append(flags,
 			"--debug",
 			"--verbose")
+		requestReleaseMode = false
+	}
+
+	// Don't strip out debug information for eng builds, unless the target
+	// explicitly provided the `--release` build flag. This allows certain
+	// test targets to remain optimized as part of eng test_suites builds.
+	if requestReleaseMode {
+		flags = append(flags, "--release")
+	} else if ctx.Config().Eng() {
+		flags = append(flags, "--debug")
 	}
 
 	// Supplying the platform build flag disables various features like API modeling and desugaring.
@@ -383,11 +397,6 @@ func (d *dexer) r8Flags(ctx android.ModuleContext, dexParams *compileDexParams) 
 	}
 	// TODO(ccross): if this is an instrumentation test of an obfuscated app, use the
 	// dictionary of the app and move the app from libraryjars to injars.
-
-	// Don't strip out debug information for eng builds.
-	if ctx.Config().Eng() {
-		r8Flags = append(r8Flags, "--debug")
-	}
 
 	// TODO(b/180878971): missing classes should be added to the relevant builds.
 	// TODO(b/229727645): do not use true as default for Android platform builds.
