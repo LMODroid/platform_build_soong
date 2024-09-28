@@ -280,6 +280,7 @@ qcom.fmradio
 
 # MTK adds
 com\.mediatek\.common\.prizeoption
+com\.pri\.utils
 vendor\.mediatek\.hardware\.nvram\.V1_0
 
 ###################################################
