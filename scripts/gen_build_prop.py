@@ -470,7 +470,9 @@ def append_additional_vendor_props(args):
   # Build system set BOARD_API_LEVEL to show the api level of the vendor API surface.
   # This must not be altered outside of build system.
   if config["VendorApiLevel"]:
-    props.append(f"ro.board.api_level={config['VendorApiLevel']}")
+    props.append(f"ro.board.api_level?={config['VendorApiLevel']}")
+    if config["VendorApiLevelPropOverride"]:
+      props.append(f"ro.board.api_level={config['VendorApiLevelPropOverride']}")
 
   # RELEASE_BOARD_API_LEVEL_FROZEN is true when the vendor API surface is frozen.
   if build_flags["RELEASE_BOARD_API_LEVEL_FROZEN"]:
