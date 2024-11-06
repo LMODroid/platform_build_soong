@@ -250,7 +250,7 @@ func (b *bindgenDecorator) GenerateSource(ctx ModuleContext, deps PathDeps) andr
 
 	// Module defined clang flags and include paths
 	cflags = append(cflags, esc(cflagsProp)...)
-	for _, include := range b.ClangProperties.Local_include_dirs {
+	for _, include := range b.ClangProperties.Local_include_dirs.GetOrDefault(ctx, nil) {
 		cflags = append(cflags, "-I"+android.PathForModuleSrc(ctx, include).String())
 		implicits = append(implicits, android.PathForModuleSrc(ctx, include))
 	}
