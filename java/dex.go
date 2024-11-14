@@ -302,7 +302,7 @@ func (d *dexer) d8Flags(ctx android.ModuleContext, dexParams *compileDexParams) 
 	return d8Flags, d8Deps, artProfileOutput
 }
 
-func (d *dexer) r8Flags(ctx android.ModuleContext, dexParams *compileDexParams) (r8Flags []string, r8Deps android.Paths, artProfileOutput *android.OutputPath) {
+func (d *dexer) r8Flags(ctx android.ModuleContext, dexParams *compileDexParams, debugMode bool) (r8Flags []string, r8Deps android.Paths, artProfileOutput *android.OutputPath) {
 	flags := dexParams.flags
 	opt := d.dexProperties.Optimize
 
@@ -374,7 +374,9 @@ func (d *dexer) r8Flags(ctx android.ModuleContext, dexParams *compileDexParams) 
 		r8Flags = append(r8Flags, "--force-proguard-compatibility")
 	}
 
-	if Bool(opt.Optimize) || Bool(opt.Obfuscate) {
+	// Avoid unnecessary stack frame noise by only injecting source map ids for non-debug
+	// optimized or obfuscated targets.
+	if (Bool(opt.Optimize) || Bool(opt.Obfuscate)) && !debugMode {
 		// TODO(b/213833843): Allow configuration of the prefix via a build variable.
 		var sourceFilePrefix = "go/retraceme "
 		var sourceFileTemplate = "\"" + sourceFilePrefix + "%MAP_ID\""
@@ -489,7 +491,8 @@ func (d *dexer) compileDex(ctx android.ModuleContext, dexParams *compileDexParam
 			proguardUsageZip,
 			proguardConfiguration,
 		}
-		r8Flags, r8Deps, r8ArtProfileOutputPath := d.r8Flags(ctx, dexParams)
+		debugMode := android.InList("--debug", commonFlags)
+		r8Flags, r8Deps, r8ArtProfileOutputPath := d.r8Flags(ctx, dexParams, debugMode)
 		rule := r8
 		args := map[string]string{
 			"r8Flags":        strings.Join(append(commonFlags, r8Flags...), " "),
