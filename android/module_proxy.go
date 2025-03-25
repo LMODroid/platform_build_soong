@@ -27,10 +27,6 @@ func (m ModuleProxy) GenerateAndroidBuildActions(context ModuleContext) {
 	panic("method is not implemented on ModuleProxy")
 }
 
-func (m ModuleProxy) CleanupAfterBuildActions() {
-	panic("method is not implemented on ModuleProxy")
-}
-
 func (m ModuleProxy) ComponentDepsMutator(ctx BottomUpMutatorContext) {
 	panic("method is not implemented on ModuleProxy")
 }
