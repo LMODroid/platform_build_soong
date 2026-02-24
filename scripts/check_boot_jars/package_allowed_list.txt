@@ -216,6 +216,14 @@ vendor\.google_clockwork\.displayoffload3\..*
 # Lineage adds
 vendor\.lineage.*
 
+# MTK adds
+com\.mediatek
+com\.mediatek\..*
+mediatek
+mediatek\..*
+vendor\.mediatek
+vendor\.mediatek\..*
+
 # NT adds
 com\.nothing
 com\.nothing\..*
